@@ -23,7 +23,6 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
       NPM_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
       REGISTRY_URL: ${{ vars.REGISTRY_URL }}
-      PUBLISH_REGISTRY_URL: ${{ vars.PUBLISH_REGISTRY_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,8 +32,13 @@ jobs:
         with:
           node-version: 22
           cache: "pnpm"
-          registry-url: ${{ env.REGISTRY_URL }}
-          scope: '@refinedev'
+      - name: Creating .npmrc
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+            ${{ env.REGISTRY_URL }}/:_authToken=$ARTIFACTORY_TOKEN
+          EOF
+        env:
+          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
       - name: Install Dependencies & Build
         run: pnpm install
       - name: Lint
@@ -52,11 +56,6 @@ jobs:
       - name: Test
         run: pnpm test:all
         if: ${{ env.RELEASE_ONLY != 'true' }}
-      - name: Create .npmrc for publish
-        run: |
-          cat << EOF >> "$HOME/.npmrc"
-            @refinedev:registry=${{ env.PUBLISH_REGISTRY_URL }}
-          EOF
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
@@ -67,5 +66,5 @@ jobs:
           title: "ci(changesets): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
