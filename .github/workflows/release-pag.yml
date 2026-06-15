@@ -23,6 +23,7 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
       NPM_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
       REGISTRY_URL: ${{ vars.REGISTRY_URL }}
+      REGISTRY_HOST: ${{ vars.REGISTRY_HOST }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,8 +35,10 @@ jobs:
           cache: "pnpm"
       - name: Creating .npmrc
         run: |
-          cat << EOF > "$HOME/.npmrc"
-            ${{ env.REGISTRY_URL }}/:_authToken=$ARTIFACTORY_TOKEN
+          cat > "$HOME/.npmrc" << EOF
+          registry=${{ env.REGISTRY_URL }}/
+          //${{ env.REGISTRY_HOST }}/:_authToken=${ARTIFACTORY_TOKEN}
+          @refinedev:registry=${{ env.REGISTRY_URL }}/
           EOF
         env:
           ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
@@ -61,10 +64,10 @@ jobs:
         uses: changesets/action@v1
         with:
           version: pnpm version-packages
-          publish: pnpm publish -r --filter '[origin/main]'
+          publish: pnpm changeset publish
           commit: "ci(changesets): version packages"
           title: "ci(changesets): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+          NPM_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
