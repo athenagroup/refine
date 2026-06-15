@@ -1,5 +1,11 @@
 # @refinedev/react-hook-form
 
+## 5.0.5
+
+### Patch Changes
+
+- [`d1f25370ee38fd5e329bea7ff04c430ea00e0a91`](https://github.com/athenagroup/refine/commit/d1f25370ee38fd5e329bea7ff04c430ea00e0a91) Thanks [@Woutuuur](https://github.com/Woutuuur)! - Fix useFieldArray.fields empty on subsequent loads
+
 ## 5.0.4
 
 ### Patch Changes
