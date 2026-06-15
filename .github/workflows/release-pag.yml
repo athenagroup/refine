@@ -32,13 +32,7 @@ jobs:
         with:
           node-version: 22
           cache: "pnpm"
-      - name: Creating .npmrc
-        run: |
-          cat << EOF > "$HOME/.npmrc"
-            ${{ env.REGISTRY_URL }}/:_authToken=$ARTIFACTORY_TOKEN
-          EOF
-        env:
-          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+          registry-url: ${{ vars.REGISTRY_URL }}
       - name: Install Dependencies & Build
         run: pnpm install
       - name: Lint
@@ -61,10 +55,14 @@ jobs:
         uses: changesets/action@v1
         with:
           version: pnpm version-packages
-          publish: pnpm publish -r --filter '[origin/main]'
+          publish: pnpm changeset publish
           commit: "ci(changesets): version packages"
           title: "ci(changesets): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+          NPM_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      - name: Dump npm debug log on failure
+        if: failure()
+        run: |
+          cat "$(ls -t "$HOME"/.npm/_logs/*-debug-0.log | head -1)" || true
