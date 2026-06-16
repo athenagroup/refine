@@ -1,0 +1,76 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Every Monday at 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Force-mirror origin/main to upstream refinedev/refine main.
+      # origin/main is a pure read-only mirror; all PAG work lives on pag.
+      - name: Mirror upstream/main to origin/main
+        run: |
+          git remote add upstream https://github.com/refinedev/refine.git
+          git fetch upstream main
+
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "origin/main is already up-to-date"
+          else
+            git push origin upstream/main:refs/heads/main --force-with-lease
+          fi
+
+      - name: Check if pag is behind main
+        id: check
+        run: |
+          git fetch origin pag
+          AHEAD=$(git rev-list --count origin/pag..origin/main)
+          echo "ahead=$AHEAD" >> "$GITHUB_OUTPUT"
+          echo "branch=sync/upstream-$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Create sync branch and open PR
+        if: steps.check.outputs.ahead != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: |
+            Automated weekly upstream sync.
+
+            Resolve any conflicts and merge. Take spcial care of version numbering.
+            Merging this PR will trigger `release-pag.yml` and publish to JFrog.
+
+            > This PR was opened automatically by the `sync-upstream` workflow.
+        run: |
+          BRANCH="${{ steps.check.outputs.branch }}"
+
+          EXISTING=$(gh pr list --base pag --head "$BRANCH" --state open --json number -q '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "Sync PR #$EXISTING already open; skipping."
+            exit 0
+          fi
+
+          git checkout -b "$BRANCH"
+          git push origin "$BRANCH"
+
+          echo "$PR_BODY" > /tmp/pr-body.md
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base pag \
+            --head "$BRANCH" \
+            --title "chore: sync upstream refine into pag" \
+            --body-file /tmp/pr-body.md
