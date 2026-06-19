@@ -107,7 +107,11 @@ export const routerProvider: RouterProvider = {
 
     // params is empty when useParams is used in a component that is not a child of a Route
     if (Object.entries(params).length === 0 && matchedRoute) {
-      params = matchPath(matchedRoute, pathname)?.params || {};
+      // `end: false` lets the matched resource route be a parent (prefix) of the
+      // current path, so params are still extracted when the resource is shown
+      // on a sub-route (e.g. a tabbed interface rendered under `show/:id`).
+      params =
+        matchPath({ path: matchedRoute, end: false }, pathname)?.params || {};
     }
 
     const fn = useCallback(() => {
