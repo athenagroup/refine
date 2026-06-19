@@ -159,7 +159,10 @@ export function useDataGrid<
 > = {}): UseDataGridReturnType<TData, TError, TSearchVariables> {
   const liveMode = useLiveMode(liveModeFromProp);
 
-  const columnsTypes = useRef<Record<string, string>>({});
+  // Tracked in state (not a ref) so `transformedFilterModel` recomputes when
+  // column types resolve. `onStateChange` only updates this when types actually
+  // change, so re-renders stay rare.
+  const [columnsTypes, setColumnsTypes] = useState<Record<string, string>>({});
   // Debounce server-side filter fetches so UI input stays responsive.
   const filterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -389,9 +392,9 @@ export function useDataGrid<
     () =>
       transformCrudFiltersToFilterModel(
         differenceWith(muiCrudFilters, preferredPermanentFilters, isEqual),
-        columnsTypes.current,
+        columnsTypes,
       ),
-    [muiCrudFilters, preferredPermanentFilters, columnsTypes.current],
+    [muiCrudFilters, preferredPermanentFilters, columnsTypes],
   );
 
   const filterModelWithQuickFilter = useMemo<GridFilterModel>(
@@ -426,11 +429,11 @@ export function useDataGrid<
             return [key, (value as any).type];
           }),
         );
-        const isStateChanged = !isEqual(newColumnsTypes, columnsTypes.current);
-
-        if (isStateChanged) {
-          columnsTypes.current = newColumnsTypes;
-        }
+        // Bail out (return the same reference) when nothing changed so React
+        // skips the re-render; `onStateChange` fires very frequently.
+        setColumnsTypes((prev) =>
+          isEqual(newColumnsTypes, prev) ? prev : newColumnsTypes,
+        );
       },
       processRowUpdate: editable ? processRowUpdate : undefined,
     },
