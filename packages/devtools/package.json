@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/devtools",
+  "name": "@athenagroup/refine-devtools",
   "version": "2.0.5",
   "private": false,
   "description": "refine devtools offers a set of features from monitoring to quickly prototyping a UI.",
@@ -47,6 +47,10 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
+    "@athenagroup/refine-cli": "workspace:*",
+    "@athenagroup/refine-core": "workspace:*",
+    "@athenagroup/refine-devtools-server": "workspace:*",
+    "@athenagroup/refine-devtools-shared": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/lodash": "^4.14.171",

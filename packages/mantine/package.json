@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/mantine",
+  "name": "@athenagroup/refine-mantine",
   "version": "3.0.2",
   "private": false,
   "description": "refine is a React-based framework for building internal tools, rapidly.",
@@ -54,10 +54,11 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
+    "@athenagroup/refine-ui-types": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@refinedev/cli": "^2.16.50",
-    "@refinedev/core": "^5.0.5",
-    "@refinedev/ui-tests": "^2.0.1",
+    "@refinedev/cli": "workspace:@athenagroup/refine-cli@*",
+    "@refinedev/core": "workspace:@athenagroup/refine-core@*",
+    "@refinedev/ui-tests": "workspace:@athenagroup/refine-ui-tests@*",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/react-hooks": "^8.0.1",

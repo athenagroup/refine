@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/cli",
+  "name": "@athenagroup/refine-cli",
   "version": "2.16.52",
   "private": false,
   "description": "Refine CLI tool, streamlining the development of Refine applications.",
@@ -72,6 +72,7 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
+    "@athenagroup/refine-devtools-server": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
     "@types/center-align": "^1.0.0",
     "@types/dedent": "^0.7.0",

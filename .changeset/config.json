@@ -10,7 +10,7 @@
   "access": "public",
   "baseBranch": "pag",
   "updateInternalDependencies": "minor",
-  "ignore": ["!@refinedev/*", "!create-refine-app"],
+  "ignore": ["!@athenagroup/refine-*", "!create-refine-app"],
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   }

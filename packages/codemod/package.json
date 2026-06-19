@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/codemod",
+  "name": "@athenagroup/refine-codemod",
   "version": "4.4.3",
   "private": false,
   "description": "Codemod scripts for Refine, automating code transformations and migrations.",

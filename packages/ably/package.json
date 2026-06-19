@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/ably",
+  "name": "@athenagroup/refine-ably",
   "version": "5.0.1",
   "private": false,
   "description": "Ably Live Provider for Refine, enabling real-time updates to your Refine applications effortlessly.",
@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@refinedev/core": "^5.0.5",
+    "@refinedev/core": "workspace:@athenagroup/refine-core@*",
     "@types/node": "^20",
     "jsdom": "^25.0.1",
     "nock": "^13.4.0",

@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/simple-rest",
+  "name": "@athenagroup/refine-simple-rest",
   "version": "6.0.1",
   "private": false,
   "description": "Simple REST Data Provider for Refine, enabling seamless REST API interactions.",
@@ -46,8 +46,8 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@refinedev/cli": "^2.16.50",
-    "@refinedev/core": "^5.0.5",
+    "@refinedev/cli": "workspace:@athenagroup/refine-cli@*",
+    "@refinedev/core": "workspace:@athenagroup/refine-core@*",
     "@types/node": "^20",
     "@vitest/ui": "^2.1.8",
     "nock": "^13.4.0",

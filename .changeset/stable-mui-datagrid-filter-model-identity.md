@@ -1,5 +1,5 @@
 ---
-"@refinedev/mui": patch
+"@athenagroup/refine-mui": patch
 ---
 
 fix(mui): stabilize `filterModel` identity returned from `useDataGrid`

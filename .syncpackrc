@@ -10,10 +10,10 @@
       "label": "These packages should only be under devDependencies."
     },
     {
-      "dependencies": ["@refinedev/**"],
+      "dependencies": ["@refinedev/**", "@athenagroup/**"],
       "packages": ["**"],
       "isIgnored": true,
-      "label": "@refinedev dependencies are managed by changeset."
+      "label": "@refinedev/@athenagroup dependencies are managed by changeset."
     },
     {
       "dependencies": ["**"],
@@ -25,11 +25,11 @@
       "dependencies": ["nock"],
       "dependencyTypes": ["dev"],
       "packages": [
-        "@refinedev/appwrite",
-        "@refinedev/graphql",
-        "@refinedev/nestjsx-crud",
-        "@refinedev/rest",
-        "@refinedev/supabase"
+        "@athenagroup/refine-appwrite",
+        "@athenagroup/refine-graphql",
+        "@athenagroup/refine-nestjsx-crud",
+        "@athenagroup/refine-rest",
+        "@athenagroup/refine-supabase"
       ],
       "isIgnored": true
     },
@@ -58,7 +58,7 @@
         "clsx",
         "@netlify/plugin-nextjs"
       ],
-      "packages": ["@refinedev/refine-ui"],
+      "packages": ["@athenagroup/refine-refine-ui"],
       "isIgnored": true
     }
   ]

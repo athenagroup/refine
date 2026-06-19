@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/devtools-internal",
+  "name": "@athenagroup/refine-devtools-internal",
   "version": "2.0.2",
   "private": false,
   "description": "refine devtools offers a set of features from monitoring to quickly prototyping a UI.",
@@ -45,6 +45,7 @@
     "error-stack-parser": "^2.1.4"
   },
   "devDependencies": {
+    "@athenagroup/refine-devtools-shared": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/node": "^20",

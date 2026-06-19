@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/devtools-shared",
+  "name": "@athenagroup/refine-devtools-shared",
   "version": "2.0.2",
   "private": false,
   "description": "refine devtools offers a set of features from monitoring to quickly prototyping a UI.",
