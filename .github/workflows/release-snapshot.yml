@@ -1,0 +1,46 @@
+name: Release Snapshot
+
+on:
+  push:
+
+jobs:
+  publish:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}-snapshot-release
+      cancel-in-progress: true
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      NPM_TOKEN: ${{ secrets.ARTIFACTORY_TOKEN }}
+      REGISTRY_URL: ${{ vars.REGISTRY_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+          registry-url: ${{ vars.REGISTRY_URL }}
+      - name: Install dependencies
+        run: pnpm install
+      # Stamp every package with the commit hash as its version (e.g.
+      # 0.0.0-1a2b3c4). --force-publish bumps all packages, not just changed
+      # ones; --exact pins internal references exactly. The published
+      # @refinedev/* dependency/peer contracts are left untouched (they are not
+      # workspace package names), matching the fork's alias-based consumption.
+      - name: Set snapshot version
+        run: pnpm exec lerna version "0.0.0-$(git rev-parse --short HEAD)" --force-publish --exact --no-git-tag-version --no-push --yes
+      # Publish the @athenagroup/refine-* packages under the `snapshot` dist-tag.
+      # pnpm builds each package via its `prepare` script (resolving @refinedev/*
+      # imports to the local fork through the root pnpm.overrides) and converts
+      # the workspace: build-graph devDeps on the way out. Private packages and
+      # the unscoped create-refine-app are skipped; --no-git-checks allows the
+      # uncommitted version bump.
+      - name: Publish snapshot
+        run: pnpm publish -r --filter "@athenagroup/refine-*" --tag snapshot --no-git-checks
+      - name: Dump npm debug log on failure
+        if: failure()
+        run: |
+          cat "$(ls -t "$HOME"/.npm/_logs/*-debug-0.log | head -1)" || true
