@@ -86,4 +86,47 @@ describe("pickMatchedRoute", () => {
 
     expect(picked?.route).toEqual("/users/refine/list/:id");
   });
+
+  it("should prefer the most specific (longest) route", () => {
+    const routes = [
+      {
+        route: "/users",
+        action: "list" as const,
+        resource: { name: "users" },
+      },
+      {
+        route: "/users/show/:id",
+        action: "show" as const,
+        resource: { name: "users" },
+      },
+    ];
+
+    const picked = pickMatchedRoute(routes);
+
+    expect(picked?.route).toEqual("/users/show/:id");
+  });
+
+  it("should pick the least parametrized route among the longest matches", () => {
+    const routes = [
+      {
+        route: "/users",
+        action: "list" as const,
+        resource: { name: "users" },
+      },
+      {
+        route: "/users/:type/show/:id",
+        action: "show" as const,
+        resource: { name: "users" },
+      },
+      {
+        route: "/users/orgs/show/:id",
+        action: "show" as const,
+        resource: { name: "org-users" },
+      },
+    ];
+
+    const picked = pickMatchedRoute(routes);
+
+    expect(picked?.route).toEqual("/users/orgs/show/:id");
+  });
 });

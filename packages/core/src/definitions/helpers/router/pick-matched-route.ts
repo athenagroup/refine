@@ -6,12 +6,19 @@ import { splitToSegments } from "./split-to-segments";
 /**
  * Picks the most eligible route from the given matched routes.
  * - If there's only one route, it returns it.
- * - If there's more than one route, it picks the best non-greedy match.
+ * - Matched routes may have different number of segments, since a route can
+ *   match both a parent (prefix) route and a more specific one. The most
+ *   specific match is the one with the most segments, so only the longest
+ *   matches are considered. (An exact match is always the longest possible
+ *   match for a given route, so exact matches are preferred over parent ones.)
+ * - If there's more than one route with the same length, it picks the best
+ *   non-greedy (least parametrized) match.
  */
 export const pickMatchedRoute = (
   routes: ResourceActionRoute[],
 ): ResourceActionRoute | undefined => {
-  // these routes are all matched, we should pick the least parametrized one
+  // these routes are all matched, we should pick the most specific one and,
+  // among equally specific ones, the least parametrized one
 
   // no routes, no match
   if (routes.length === 0) {
@@ -30,12 +37,17 @@ export const pickMatchedRoute = (
     splitted: splitToSegments(removeLeadingTrailingSlashes(route.route)),
   }));
 
-  // at this point, before calling this function, we already checked for segment lenghts and expect all of them to be the same
-  const segmentsCount = sanitizedRoutes[0]?.splitted.length ?? 0;
+  // routes may have a different number of segments when a route matches a
+  // parent (prefix) route as well as a more specific one. the most specific
+  // match is the one with the most segments, so we only keep the longest
+  // matches and pick the least parametrized one among them.
+  const segmentsCount = Math.max(
+    ...sanitizedRoutes.map((route) => route.splitted.length),
+  );
 
-  let eligibleRoutes: Array<(typeof sanitizedRoutes)[number]> = [
-    ...sanitizedRoutes,
-  ];
+  let eligibleRoutes = sanitizedRoutes.filter(
+    (route) => route.splitted.length === segmentsCount,
+  );
 
   // loop through the segments
   for (let i = 0; i < segmentsCount; i++) {
