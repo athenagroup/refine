@@ -40,7 +40,7 @@
       "dependsOn": ["build"]
     }
   },
-  "defaultProject": "@refinedev/core",
+  "defaultProject": "@athenagroup/refine-core",
   "cli": {
     "packageManager": "pnpm"
   },

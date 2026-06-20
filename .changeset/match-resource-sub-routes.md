@@ -1,6 +1,6 @@
 ---
-"@refinedev/core": patch
-"@refinedev/react-router": patch
+"@athenagroup/refine-core": patch
+"@athenagroup/refine-react-router": patch
 ---
 
 fix: match resource by parent (prefix) routes so sub-routes resolve to their resource

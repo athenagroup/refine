@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/devtools-server",
+  "name": "@athenagroup/refine-devtools-server",
   "version": "2.0.2",
   "private": false,
   "description": "refine devtools offers a set of features from monitoring to quickly prototyping a UI.",
@@ -71,8 +71,9 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
+    "@athenagroup/refine-devtools-shared": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@refinedev/devtools-ui": "2.0.3",
+    "@refinedev/devtools-ui": "workspace:@athenagroup/refine-devtools-ui@*",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/dedent": "^0.7.0",
     "@types/express": "^4.17.21",

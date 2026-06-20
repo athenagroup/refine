@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/devtools-ui",
+  "name": "@athenagroup/refine-devtools-ui",
   "version": "2.0.3",
   "private": false,
   "description": "refine devtools offers a set of features from monitoring to quickly prototyping a UI.",
@@ -59,6 +59,7 @@
     "semver-diff": "^3.1.1"
   },
   "devDependencies": {
+    "@athenagroup/refine-devtools-shared": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
     "@tailwindcss/typography": "^0.5.9",
     "@testing-library/dom": "^10.4.0",

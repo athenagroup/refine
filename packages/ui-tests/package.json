@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/ui-tests",
+  "name": "@athenagroup/refine-ui-tests",
   "version": "2.0.1",
   "private": false,
   "description": "UI test utilities for Refine, ensuring quality and reliability.",
@@ -35,6 +35,8 @@
     "tslib": "^2.6.2"
   },
   "devDependencies": {
+    "@athenagroup/refine-core": "workspace:*",
+    "@athenagroup/refine-ui-types": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

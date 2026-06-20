@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/nextjs-router",
+  "name": "@athenagroup/refine-nextjs-router",
   "version": "7.0.5",
   "private": false,
   "description": "React Router v6 support for Refine, with full routing capabilities.",
@@ -91,7 +91,7 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@refinedev/core": "^5.0.10",
+    "@refinedev/core": "workspace:@athenagroup/refine-core@*",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/node": "^20",
     "@types/qs": "^6.9.7",

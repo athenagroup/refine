@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/refine-ui",
+  "name": "@athenagroup/refine-refine-ui",
   "version": "0.1.1",
   "private": true,
   "scripts": {
@@ -70,6 +70,12 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@athenagroup/refine-core": "workspace:*",
+    "@athenagroup/refine-react-hook-form": "workspace:*",
+    "@athenagroup/refine-react-router": "workspace:*",
+    "@athenagroup/refine-react-table": "workspace:*",
+    "@athenagroup/refine-simple-rest": "workspace:*",
+    "@athenagroup/refine-ui-types": "workspace:*",
     "@eslint/eslintrc": "^3",
     "@netlify/plugin-nextjs": "^5.11.2",
     "@tailwindcss/postcss": "^4.1.4",

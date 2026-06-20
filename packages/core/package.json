@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/core",
+  "name": "@athenagroup/refine-core",
   "version": "5.1.0",
   "private": false,
   "description": "Refine is a React meta-framework for building enterprise-level, data-intensive applications rapidly with support for modern UI libraries and headless integrations.",
@@ -49,6 +49,7 @@
     "warn-once": "^0.1.0"
   },
   "devDependencies": {
+    "@athenagroup/refine-devtools-internal": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",

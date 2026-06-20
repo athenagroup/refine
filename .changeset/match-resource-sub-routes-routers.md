@@ -1,6 +1,6 @@
 ---
-"@refinedev/remix-router": patch
-"@refinedev/nextjs-router": patch
+"@athenagroup/refine-remix-router": patch
+"@athenagroup/refine-nextjs-router": patch
 ---
 
 fix: match resource by parent (prefix) routes so sub-routes resolve to their resource

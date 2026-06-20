@@ -1,5 +1,5 @@
 {
-  "name": "@refinedev/mui",
+  "name": "@athenagroup/refine-mui",
   "version": "8.0.3",
   "private": false,
   "description": "Material-UI (MUI) support for Refine, providing enterprise-level UI components.",
@@ -53,10 +53,12 @@
     "warn-once": "^0.1.0"
   },
   "devDependencies": {
+    "@athenagroup/refine-react-hook-form": "workspace:*",
+    "@athenagroup/refine-ui-types": "workspace:*",
     "@esbuild-plugins/node-resolve": "^0.1.4",
-    "@refinedev/cli": "^2.16.48",
-    "@refinedev/core": "^5.1.0",
-    "@refinedev/ui-tests": "^2.0.0",
+    "@refinedev/cli": "workspace:@athenagroup/refine-cli@*",
+    "@refinedev/core": "workspace:@athenagroup/refine-core@*",
+    "@refinedev/ui-tests": "workspace:@athenagroup/refine-ui-tests@*",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/react-hooks": "^8.0.1",
