@@ -1,5 +1,13 @@
 # @refinedev/remix-router
 
+## 4.0.5
+
+### Patch Changes
+
+- [#13](https://github.com/athenagroup/refine/pull/13) [`920a926ec7d67ea160f93c6e6e08703a6622e413`](https://github.com/athenagroup/refine/commit/920a926ec7d67ea160f93c6e6e08703a6622e413) Thanks [@jwgmeligmeyling](https://github.com/jwgmeligmeyling)! - fix: match resource by parent (prefix) routes so sub-routes resolve to their resource
+
+  Sub-routes (e.g. a tabbed interface rendered under `show/:id`) now resolve to their parent resource and action without having to declare a separate "virtual" resource for every sub-route. This builds on the parent (prefix) matching added to `matchResourceFromRoute` in `@refinedev/core`; param inference (including the record `id`) already iterates over the matched resource route, so the correct params are extracted on sub-routes.
+
 ## 4.0.4
 
 ### Patch Changes
