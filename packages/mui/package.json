@@ -1,6 +1,6 @@
 {
   "name": "@athenagroup/refine-mui",
-  "version": "8.0.3",
+  "version": "8.1.0",
   "private": false,
   "description": "Material-UI (MUI) support for Refine, providing enterprise-level UI components.",
   "license": "MIT",

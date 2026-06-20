@@ -1,6 +1,6 @@
 {
   "name": "@athenagroup/refine-remix-router",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "private": false,
   "description": "Remix router integration package for Refine.",
   "repository": {

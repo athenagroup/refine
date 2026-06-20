@@ -1,6 +1,6 @@
 {
   "name": "@athenagroup/refine-nextjs-router",
-  "version": "7.0.5",
+  "version": "7.0.6",
   "private": false,
   "description": "React Router v6 support for Refine, with full routing capabilities.",
   "repository": {

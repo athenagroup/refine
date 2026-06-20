@@ -1,5 +1,37 @@
 # @refinedev/mui
 
+## 8.1.0
+
+### Minor Changes
+
+- [#7](https://github.com/athenagroup/refine/pull/7) [`1f55d781baf9c92078723c8b7063816370ae1070`](https://github.com/athenagroup/refine/commit/1f55d781baf9c92078723c8b7063816370ae1070) Thanks [@jwgmeligmeyling](https://github.com/jwgmeligmeyling)! - feat(mui): propagate DataGrid `quickFilterValues` to the data provider via `meta`
+
+  `useDataGrid` now forwards `quickFilterValues` and `quickFilterLogicOperator` from MUI's `GridFilterModel` through to the data provider's `getList` call via `meta`. Previously these fields on the filter model were ignored, so the toolbar's quick filter input had no effect in server-side filtering mode.
+
+  The values bypass `CrudFilters` (which map 1:1 to per-column `GridFilterItem`s) and are placed on `meta` instead, so the data provider can interpret them as a free-text search parameter — e.g. translating to a `q=` query string — or ignore them. The toolbar input is kept in sync via the returned `filterModel`, so it remains responsive as the user types while the server query stays debounced.
+
+  ```ts
+  // dataProvider
+  getList: async ({ resource, filters, sorters, pagination, meta }) => {
+    const params = new URLSearchParams();
+    if (meta?.quickFilterValues?.length) {
+      params.set("q", meta.quickFilterValues.join(" "));
+      if (meta.quickFilterLogicOperator) {
+        params.set("q_op", meta.quickFilterLogicOperator);
+      }
+    }
+    // ...
+  };
+  ```
+
+### Patch Changes
+
+- [#5](https://github.com/athenagroup/refine/pull/5) [`d576310a5e5caafe9d0ab59b742353b5f547dd33`](https://github.com/athenagroup/refine/commit/d576310a5e5caafe9d0ab59b742353b5f547dd33) Thanks [@jwgmeligmeyling](https://github.com/jwgmeligmeyling)! - fix(mui): stabilize `filterModel` identity returned from `useDataGrid`
+
+  `useDataGrid` returned `dataGridProps.filterModel` as a freshly-allocated object on every render even when the underlying filter state was unchanged. Consumers feeding it into MUI X DataGrid (or to `useEffect` deps keyed on its identity) hit unnecessary work and could trigger effect loops in user code.
+
+  Wrapped the `filterModel` computation in `useMemo` keyed on `muiCrudFilters`, the permanent filters, and the column-type map — mirroring the existing memoization already used for `sortModel`. Behavior is otherwise unchanged: the value still updates whenever the underlying filter state or the DataGrid-reported column types actually change.
+
 ## 8.0.3
 
 ### Patch Changes
