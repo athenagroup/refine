@@ -14,13 +14,16 @@ import {
   type useTableReturnType as useTableReturnTypeCore,
   useResourceParams,
 } from "@refinedev/core";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type {
   DataGridProps,
   GridFilterModel,
   GridLogicOperator,
+  GridPaginationModel,
   GridSortModel,
+  GridState,
+  GridValidRowModel,
 } from "@mui/x-data-grid";
 
 import differenceWith from "lodash/differenceWith";
@@ -127,6 +130,9 @@ export type UseDataGridReturnType<
 const defaultPermanentFilter: CrudFilter[] = [];
 const defaultPermanentSort: CrudSort[] = [];
 const DEFAULT_FILTER_DEBOUNCE_MS = 300;
+// Stable empty-array identity for the no-data case so `dataGridProps.rows`
+// doesn't churn on every render (a fresh `[]` would re-derive the grid row tree).
+const EMPTY_ROWS: readonly GridValidRowModel[] = [];
 
 export function useDataGrid<
   TQueryFnData extends BaseRecord = BaseRecord,
@@ -239,8 +245,10 @@ export function useDataGrid<
 
   const rowCountRef = useRef(data?.total || 0);
   const rowCount = useMemo(() => {
-    if (data?.total) {
-      rowCountRef.current = data.total;
+    // Update whenever data is present (including a genuine drop to 0); only keep
+    // the previous count while data is undefined (loading), to avoid layout jumps.
+    if (data) {
+      rowCountRef.current = data.total ?? 0;
     }
     return rowCountRef.current;
   }, [data]);
@@ -254,23 +262,29 @@ export function useDataGrid<
   const preferredPermanentFilters =
     filtersFromProp?.permanent ?? defaultPermanentFilter;
 
-  const handlePageChange = (page: number) => {
-    if (isPaginationEnabled) {
-      setCurrentPage(page + 1);
-    }
-  };
-  const handlePageSizeChange = (pageSize: number) => {
-    if (isPaginationEnabled) {
-      setPageSize(pageSize);
-    }
-  };
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (isPaginationEnabled) {
+        setCurrentPage(page + 1);
+      }
+    },
+    [isPaginationEnabled, setCurrentPage],
+  );
+  const handlePageSizeChange = useCallback(
+    (size: number) => {
+      if (isPaginationEnabled) {
+        setPageSize(size);
+      }
+    },
+    [isPaginationEnabled, setPageSize],
+  );
 
-  const clearFilterDebounce = () => {
+  const clearFilterDebounce = useCallback(() => {
     if (filterDebounceRef.current) {
       clearTimeout(filterDebounceRef.current);
       filterDebounceRef.current = null;
     }
-  };
+  }, []);
 
   // Ensure no pending filter update fires after unmount.
   useEffect(() => {
@@ -280,37 +294,53 @@ export function useDataGrid<
   }, []);
 
   // Apply filters immediately to local state (and reset page if needed).
-  const applyFilters = (crudFilters: CrudFilters) => {
-    setFilters(crudFilters.filter((f) => f.value !== ""));
-    if (isPaginationEnabled) {
-      setCurrentPage(1);
-    }
-  };
+  const applyFilters = useCallback(
+    (crudFilters: CrudFilters) => {
+      setFilters(crudFilters.filter((f) => f.value !== ""));
+      if (isPaginationEnabled) {
+        setCurrentPage(1);
+      }
+    },
+    [setFilters, isPaginationEnabled, setCurrentPage],
+  );
 
-  const handleSortModelChange = (sortModel: GridSortModel) => {
-    const crudSorting = transformSortModelToCrudSorting(sortModel);
-    setSorters(crudSorting);
-  };
+  const handleSortModelChange = useCallback(
+    (sortModel: GridSortModel) => {
+      const crudSorting = transformSortModelToCrudSorting(sortModel);
+      setSorters(crudSorting);
+    },
+    [setSorters],
+  );
 
-  const handleFilterModelChange = (filterModel: GridFilterModel) => {
-    const crudFilters = transformFilterModelToCrudFilters(filterModel);
-    const nextQuickFilter = {
-      values: filterModel.quickFilterValues,
-      logicOperator: filterModel.quickFilterLogicOperator,
-    };
-    setMuiCrudFilters(crudFilters);
-    setDisplayQuickFilter(nextQuickFilter);
-    if (isServerSideFilteringEnabled) {
-      // Let the input update immediately; debounce only the server query.
-      clearFilterDebounce();
-      filterDebounceRef.current = setTimeout(() => {
-        applyFilters(crudFilters);
-        setAppliedQuickFilter(nextQuickFilter);
-      }, DEFAULT_FILTER_DEBOUNCE_MS);
-      return;
-    }
-    applyFilters(crudFilters);
-  };
+  const handleFilterModelChange = useCallback(
+    (filterModel: GridFilterModel) => {
+      const crudFilters = transformFilterModelToCrudFilters(filterModel);
+      const nextQuickFilter = {
+        values: filterModel.quickFilterValues,
+        logicOperator: filterModel.quickFilterLogicOperator,
+      };
+      setMuiCrudFilters(crudFilters);
+      setDisplayQuickFilter(nextQuickFilter);
+      if (isServerSideFilteringEnabled) {
+        // Let the input update immediately; debounce only the server query.
+        clearFilterDebounce();
+        filterDebounceRef.current = setTimeout(() => {
+          applyFilters(crudFilters);
+          setAppliedQuickFilter(nextQuickFilter);
+        }, DEFAULT_FILTER_DEBOUNCE_MS);
+        return;
+      }
+      applyFilters(crudFilters);
+    },
+    [
+      isServerSideFilteringEnabled,
+      applyFilters,
+      clearFilterDebounce,
+      setMuiCrudFilters,
+      setDisplayQuickFilter,
+      setAppliedQuickFilter,
+    ],
+  );
 
   const search = async (value: TSearchVariables) => {
     if (onSearchProp) {
@@ -323,35 +353,58 @@ export function useDataGrid<
     }
   };
 
-  const dataGridPaginationValues = (): Pick<
-    DataGridProps,
-    "paginationModel" | "onPaginationModelChange"
-  > &
-    Required<Pick<DataGridProps, "paginationMode">> => {
-    if (isPaginationEnabled) {
-      return {
-        paginationMode: "server" as const,
-        paginationModel: {
-          page: currentPage - 1,
-          pageSize,
-        },
-        onPaginationModelChange: (model) => {
-          handlePageChange(model.page);
-          handlePageSizeChange(model.pageSize);
-        },
-      };
-    }
+  const onPaginationModelChange = useCallback(
+    (model: GridPaginationModel) => {
+      handlePageChange(model.page);
+      handlePageSizeChange(model.pageSize);
+    },
+    [handlePageChange, handlePageSizeChange],
+  );
 
-    return {
-      paginationMode: "client" as const,
-    };
-  };
+  const paginationProps = useMemo<
+    Pick<DataGridProps, "paginationModel" | "onPaginationModelChange"> &
+      Required<Pick<DataGridProps, "paginationMode">>
+  >(
+    () =>
+      isPaginationEnabled
+        ? {
+            paginationMode: "server",
+            paginationModel: {
+              page: currentPage - 1,
+              pageSize,
+            },
+            onPaginationModelChange,
+          }
+        : {
+            paginationMode: "client",
+          },
+    [isPaginationEnabled, currentPage, pageSize, onPaginationModelChange],
+  );
 
   const { mutate } = useUpdate<TData, TError, TData>({
     mutationOptions: updateMutationOptions,
   });
 
-  const processRowUpdate = async (newRow: TData, oldRow: TData) => {
+  // `mutate` (from useUpdate) and `updateMutationOptions` are not referentially
+  // stable across renders, so read the latest values from a ref and keep
+  // `processRowUpdate`'s identity fixed — otherwise it would churn `dataGridProps`
+  // (and the whole grid) on every render.
+  const processRowUpdateDepsRef = useRef({
+    editable,
+    identifier,
+    mutate,
+    updateMutationOptions,
+  });
+  processRowUpdateDepsRef.current = {
+    editable,
+    identifier,
+    mutate,
+    updateMutationOptions,
+  };
+
+  const processRowUpdate = useCallback(async (newRow: TData, oldRow: TData) => {
+    const { editable, identifier, mutate, updateMutationOptions } =
+      processRowUpdateDepsRef.current;
     if (!editable) {
       return Promise.resolve(oldRow);
     }
@@ -378,7 +431,7 @@ export function useDataGrid<
         },
       );
     });
-  };
+  }, []);
 
   const transformedSortModel = useMemo(
     () =>
@@ -407,14 +460,32 @@ export function useDataGrid<
     [transformedFilterModel, displayQuickFilter],
   );
 
-  return {
-    tableQuery,
-    dataGridProps: {
+  const onStateChange = useCallback((state: GridState) => {
+    const newColumnsTypes = Object.fromEntries(
+      Object.entries(state.columns.lookup).map(([key, value]) => {
+        return [key, (value as any).type];
+      }),
+    );
+    // Bail out (return the same reference) when nothing changed so React
+    // skips the re-render; `onStateChange` fires very frequently.
+    setColumnsTypes((prev) =>
+      isEqual(newColumnsTypes, prev) ? prev : newColumnsTypes,
+    );
+  }, []);
+
+  // Keep a stable identity for the props handed to <DataGrid>. MUI-X memoizes on
+  // the incoming props object and exposes it via `rootProps` context, which every
+  // (memoized) GridRow/header/panel reads — so a fresh object every render
+  // re-renders the whole visible viewport. Memoizing here lets those bail out.
+  // The handlers/paginationModel/rows above are individually stabilized so this
+  // memo only changes identity when the grid's content actually changes.
+  const dataGridProps = useMemo<DataGridPropsType>(
+    () => ({
       disableRowSelectionOnClick: true,
-      rows: data?.data || [],
+      rows: data?.data || EMPTY_ROWS,
       loading: liveMode === "auto" ? isLoading : !isFetched,
       rowCount,
-      ...dataGridPaginationValues(),
+      ...paginationProps,
       sortingMode: isServerSideSortingEnabled ? "server" : "client",
       sortModel: transformedSortModel,
       onSortModelChange: handleSortModelChange,
@@ -423,20 +494,31 @@ export function useDataGrid<
       filterDebounceMs: isServerSideFilteringEnabled ? 0 : undefined,
       filterModel: filterModelWithQuickFilter,
       onFilterModelChange: handleFilterModelChange,
-      onStateChange: (state) => {
-        const newColumnsTypes = Object.fromEntries(
-          Object.entries(state.columns.lookup).map(([key, value]) => {
-            return [key, (value as any).type];
-          }),
-        );
-        // Bail out (return the same reference) when nothing changed so React
-        // skips the re-render; `onStateChange` fires very frequently.
-        setColumnsTypes((prev) =>
-          isEqual(newColumnsTypes, prev) ? prev : newColumnsTypes,
-        );
-      },
+      onStateChange,
       processRowUpdate: editable ? processRowUpdate : undefined,
-    },
+    }),
+    [
+      data?.data,
+      isLoading,
+      isFetched,
+      liveMode,
+      rowCount,
+      paginationProps,
+      isServerSideSortingEnabled,
+      transformedSortModel,
+      handleSortModelChange,
+      isServerSideFilteringEnabled,
+      filterModelWithQuickFilter,
+      handleFilterModelChange,
+      onStateChange,
+      editable,
+      processRowUpdate,
+    ],
+  );
+
+  return {
+    tableQuery,
+    dataGridProps,
     currentPage,
     setCurrentPage,
     pageSize,
