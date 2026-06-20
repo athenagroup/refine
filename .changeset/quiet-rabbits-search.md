@@ -1,5 +1,5 @@
 ---
-"@refinedev/mui": minor
+"@athenagroup/refine-mui": minor
 ---
 
 feat(mui): propagate DataGrid `quickFilterValues` to the data provider via `meta`
