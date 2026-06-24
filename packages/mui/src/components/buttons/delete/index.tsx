@@ -10,8 +10,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import LoadingButton from "@mui/lab/LoadingButton";
-
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 
 import type { DeleteButtonProps } from "../types";
@@ -96,7 +94,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
 
   return (
     <div>
-      <LoadingButton
+      <Button
         color="error"
         onClick={() => setOpen(true)}
         disabled={isDisabled}
@@ -110,7 +108,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
         {...restProps}
       >
         {buttonChildren}
-      </LoadingButton>
+      </Button>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}

@@ -5,7 +5,7 @@ import {
   RefineButtonTestIds,
 } from "@refinedev/ui-types";
 
-import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
 import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
 
 import type { ImportButtonProps } from "../types";
@@ -54,7 +54,7 @@ export const ImportButton: React.FC<ImportButtonProps> = ({
   return (
     <label htmlFor="contained-button-file">
       <input {...inputProps} id="contained-button-file" multiple hidden />
-      <LoadingButton
+      <Button
         component="span"
         startIcon={buttonStartIcon}
         loadingPosition={hideText ? "center" : "start"}
@@ -65,7 +65,7 @@ export const ImportButton: React.FC<ImportButtonProps> = ({
         {...restProps}
       >
         {buttonChildren}
-      </LoadingButton>
+      </Button>
     </label>
   );
 };
