@@ -202,7 +202,10 @@ export const Show: React.FC<ShowProps> = ({
           )
         }
         action={
-          <Box display="flex" gap="16px" {...(headerButtonProps ?? {})}>
+          <Box
+            sx={{ display: "flex", gap: "16px" }}
+            {...(headerButtonProps ?? {})}
+          >
             {headerButtons
               ? typeof headerButtons === "function"
                 ? headerButtons({

@@ -101,7 +101,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 {label}
               </LinkRouter>
             ) : (
-              <Typography fontSize="14px">{label}</Typography>
+              <Typography sx={{ fontSize: "14px" }}>{label}</Typography>
             )}
           </Grid>
         );
