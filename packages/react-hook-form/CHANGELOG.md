@@ -1,5 +1,16 @@
 # @refinedev/react-hook-form
 
+## 5.0.6
+
+### Patch Changes
+
+- [#22](https://github.com/athenagroup/refine/pull/22) [`9153161d78251e1524302a00d79fa7136464f239`](https://github.com/athenagroup/refine/commit/9153161d78251e1524302a00d79fa7136464f239) Thanks [@Woutuuur](https://github.com/Woutuuur)! - fix(core, react-hook-form): prevent cached show-page data from overwriting create modal defaultValues
+
+  When opening a create modal on a show page for the same resource, the form's `defaultValues` were overwritten by cached data from the show page's `useOne` query. This happened because `useForm` passed the URL-derived `id` to `useOne` even for create actions, causing a query key collision with the cached entry.
+
+  - **core:** Don't pass `id` to `useOne` for create actions, preventing the cache key collision at the source.
+  - **react-hook-form:** Guard the `useModalForm` visibility reset effect against create actions.
+
 ## 5.0.5
 
 ### Patch Changes
