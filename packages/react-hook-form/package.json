@@ -1,6 +1,6 @@
 {
   "name": "@athenagroup/refine-react-hook-form",
-  "version": "5.0.6",
+  "version": "5.0.7",
   "private": false,
   "description": "refine offers a React Hook Form adapter that allows you to use the React Hook Form library with refine.",
   "repository": {

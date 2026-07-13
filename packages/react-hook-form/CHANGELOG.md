@@ -1,5 +1,11 @@
 # @refinedev/react-hook-form
 
+## 5.0.7
+
+### Patch Changes
+
+- [#25](https://github.com/athenagroup/refine/pull/25) [`e30884c0196a0e4f4793cefd2a5ade3b8802a642`](https://github.com/athenagroup/refine/commit/e30884c0196a0e4f4793cefd2a5ade3b8802a642) Thanks [@sgmeligmeyling](https://github.com/sgmeligmeyling)! - Fix all query data fields being put into the form (and submitted) after the initial load. The first data load now resets the form with only the registered subset of the record (mounted fields, current form values, and `useFieldArray` names), so unregistered record fields never enter the form. All paths written by the initial application are marked as synced, so later sync passes can no longer re-apply stale query data over user edits — e.g. resurrecting a removed `useFieldArray` row whose inputs are only detected as "newly mounted" after the user has already changed the array.
+
 ## 5.0.6
 
 ### Patch Changes
