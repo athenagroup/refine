@@ -245,6 +245,9 @@ export const useList = <
       .action("list")
       .params({
         ...(preferredMeta || {}),
+        ...(combinedMeta.tenantId !== undefined && {
+          tenantId: combinedMeta.tenantId,
+        }),
         filters: prefferedFilters,
         ...(isServerPagination && {
           pagination: prefferedPagination,

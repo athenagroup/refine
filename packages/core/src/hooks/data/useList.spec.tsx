@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
@@ -11,6 +12,7 @@ import {
 import { defaultRefineOptions } from "@contexts/refine";
 
 import type { IRefineContextProvider } from "../../contexts/refine/types";
+import { MetaContextProvider } from "../../contexts/metaContext";
 import { useList } from "./useList";
 
 const mockRefineProvider: IRefineContextProvider = {
@@ -144,6 +146,52 @@ describe("useList Hook", () => {
       );
     },
   );
+
+  it("should include tenantId in queryKey so a tenant switch is a cache miss", async () => {
+    const getListMock = vi.fn().mockResolvedValue({
+      data: [],
+      total: 0,
+    });
+
+    const Wrapper = TestWrapper({
+      dataProvider: {
+        default: {
+          ...MockJSONServer.default,
+          getList: getListMock,
+        },
+      },
+      resources: [{ name: "posts" }],
+    });
+
+    renderHook(() => useList({ resource: "posts" }), {
+      wrapper: ({ children }) => (
+        <Wrapper>
+          <MetaContextProvider value={{ tenantId: "tenant-1" }}>
+            {children}
+          </MetaContextProvider>
+        </Wrapper>
+      ),
+    });
+
+    await waitFor(() => {
+      expect(getListMock).toHaveBeenCalled();
+    });
+
+    expect(getListMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          tenantId: "tenant-1",
+          queryKey: [
+            "data",
+            "default",
+            "posts",
+            "list",
+            expect.objectContaining({ tenantId: "tenant-1" }),
+          ],
+        }),
+      }),
+    );
+  });
 
   it("data should be sliced when pagination mode is client", async () => {
     const { result } = renderHook(
