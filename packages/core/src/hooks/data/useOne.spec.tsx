@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
@@ -10,6 +11,7 @@ import {
 } from "@test";
 
 import type { IRefineContextProvider } from "../../contexts/refine/types";
+import { MetaContextProvider } from "../../contexts/metaContext";
 import { useOne } from "./useOne";
 
 const mockRefineProvider: IRefineContextProvider = {
@@ -40,6 +42,82 @@ describe("useOne Hook", () => {
 
     expect(status).toBe("success");
     expect(data?.slug).toBe("ut-ad-et");
+  });
+
+  it("should cache per tenant: a tenant switch misses, switching back hits", async () => {
+    const getOneMock = vi.fn(({ meta }) =>
+      Promise.resolve({ data: { id: "1", tenant: meta?.tenantId } }),
+    );
+
+    const Wrapper = TestWrapper({
+      dataProvider: {
+        default: {
+          ...MockJSONServer.default,
+          getOne: getOneMock,
+        },
+      },
+      resources: [{ name: "posts" }],
+    });
+
+    let tenantId = "tenant-1";
+
+    const { result, rerender } = renderHook(
+      () =>
+        useOne({
+          resource: "posts",
+          id: "1",
+          // keep tenant-1's entry alive and fresh while tenant-2 is active,
+          // so switching back can only be served by its own cache entry
+          queryOptions: {
+            staleTime: Number.POSITIVE_INFINITY,
+            gcTime: Number.POSITIVE_INFINITY,
+          },
+        }),
+      {
+        wrapper: ({ children }) => (
+          <Wrapper>
+            <MetaContextProvider value={{ tenantId }}>
+              {children}
+            </MetaContextProvider>
+          </Wrapper>
+        ),
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current.result?.tenant).toBe("tenant-1");
+    });
+    expect(getOneMock).toHaveBeenCalledTimes(1);
+    expect(getOneMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          queryKey: [
+            "data",
+            "default",
+            "posts",
+            "one",
+            "1",
+            expect.objectContaining({ tenantId: "tenant-1" }),
+          ],
+        }),
+      }),
+    );
+
+    tenantId = "tenant-2";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.tenant).toBe("tenant-2");
+    });
+    expect(getOneMock).toHaveBeenCalledTimes(2);
+
+    tenantId = "tenant-1";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.tenant).toBe("tenant-1");
+    });
+    expect(getOneMock).toHaveBeenCalledTimes(2);
   });
 
   it("should only pass meta from the hook parameter and query parameters to the dataProvider", async () => {

@@ -147,11 +147,10 @@ describe("useList Hook", () => {
     },
   );
 
-  it("should include tenantId in queryKey so a tenant switch is a cache miss", async () => {
-    const getListMock = vi.fn().mockResolvedValue({
-      data: [],
-      total: 0,
-    });
+  it("should cache per tenant: a tenant switch misses, switching back hits", async () => {
+    const getListMock = vi.fn(({ meta }) =>
+      Promise.resolve({ data: [{ id: meta?.tenantId }], total: 1 }),
+    );
 
     const Wrapper = TestWrapper({
       dataProvider: {
@@ -163,24 +162,37 @@ describe("useList Hook", () => {
       resources: [{ name: "posts" }],
     });
 
-    renderHook(() => useList({ resource: "posts" }), {
-      wrapper: ({ children }) => (
-        <Wrapper>
-          <MetaContextProvider value={{ tenantId: "tenant-1" }}>
-            {children}
-          </MetaContextProvider>
-        </Wrapper>
-      ),
-    });
+    let tenantId = "tenant-1";
+
+    const { result, rerender } = renderHook(
+      () =>
+        useList({
+          resource: "posts",
+          // keep tenant-1's entry alive and fresh while tenant-2 is active,
+          // so switching back can only be served by its own cache entry
+          queryOptions: {
+            staleTime: Number.POSITIVE_INFINITY,
+            gcTime: Number.POSITIVE_INFINITY,
+          },
+        }),
+      {
+        wrapper: ({ children }) => (
+          <Wrapper>
+            <MetaContextProvider value={{ tenantId }}>
+              {children}
+            </MetaContextProvider>
+          </Wrapper>
+        ),
+      },
+    );
 
     await waitFor(() => {
-      expect(getListMock).toHaveBeenCalled();
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
     });
-
+    expect(getListMock).toHaveBeenCalledTimes(1);
     expect(getListMock).toHaveBeenCalledWith(
       expect.objectContaining({
         meta: expect.objectContaining({
-          tenantId: "tenant-1",
           queryKey: [
             "data",
             "default",
@@ -191,6 +203,35 @@ describe("useList Hook", () => {
         }),
       }),
     );
+
+    tenantId = "tenant-2";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-2" }]);
+    });
+    expect(getListMock).toHaveBeenCalledTimes(2);
+    expect(getListMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          queryKey: [
+            "data",
+            "default",
+            "posts",
+            "list",
+            expect.objectContaining({ tenantId: "tenant-2" }),
+          ],
+        }),
+      }),
+    );
+
+    tenantId = "tenant-1";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(getListMock).toHaveBeenCalledTimes(2);
   });
 
   it("data should be sliced when pagination mode is client", async () => {

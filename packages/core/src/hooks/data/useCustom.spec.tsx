@@ -1,8 +1,10 @@
+import React from "react";
 import { vi } from "vitest";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
 import { MockJSONServer, TestWrapper, mockRouterProvider } from "@test";
 
+import { MetaContextProvider } from "../../contexts/metaContext";
 import { useCustom } from "./useCustom";
 
 describe("useCustom Hook", () => {
@@ -28,6 +30,80 @@ describe("useCustom Hook", () => {
     const { data } = result.current.result;
 
     expect(data).toHaveLength(2);
+  });
+
+  it("should cache per tenant: a tenant switch misses, switching back hits", async () => {
+    const customMock = vi.fn(({ meta }) =>
+      Promise.resolve({ data: [{ id: meta?.tenantId }] }),
+    );
+
+    const Wrapper = TestWrapper({
+      dataProvider: {
+        default: {
+          ...MockJSONServer.default,
+          custom: customMock,
+        },
+      },
+      resources: [{ name: "posts" }],
+    });
+
+    let tenantId = "tenant-1";
+
+    const { result, rerender } = renderHook(
+      () =>
+        useCustom({
+          url: "remoteUrl",
+          method: "get",
+          // keep tenant-1's entry alive and fresh while tenant-2 is active,
+          // so switching back can only be served by its own cache entry
+          queryOptions: {
+            staleTime: Number.POSITIVE_INFINITY,
+            gcTime: Number.POSITIVE_INFINITY,
+          },
+        }),
+      {
+        wrapper: ({ children }) => (
+          <Wrapper>
+            <MetaContextProvider value={{ tenantId }}>
+              {children}
+            </MetaContextProvider>
+          </Wrapper>
+        ),
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(customMock).toHaveBeenCalledTimes(1);
+    expect(customMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          queryKey: [
+            "data",
+            "default",
+            "custom",
+            expect.objectContaining({ tenantId: "tenant-1" }),
+          ],
+        }),
+      }),
+    );
+
+    tenantId = "tenant-2";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-2" }]);
+    });
+    expect(customMock).toHaveBeenCalledTimes(2);
+
+    tenantId = "tenant-1";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(customMock).toHaveBeenCalledTimes(2);
   });
 
   describe("without custom query key", () => {
