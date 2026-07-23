@@ -166,6 +166,9 @@ export const useCustom = <
           url,
           ...config,
           ...(preferredMeta || {}),
+          ...(combinedMeta.tenantId !== undefined && {
+            tenantId: combinedMeta.tenantId,
+          }),
         })
         .get(),
       queryFn: (context) =>

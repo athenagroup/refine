@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
@@ -10,6 +11,7 @@ import {
 } from "@test";
 
 import type { IRefineContextProvider } from "../../contexts/refine/types";
+import { MetaContextProvider } from "../../contexts/metaContext";
 import { useMany } from "./useMany";
 import type { BaseKey } from "@contexts/data/types";
 import * as warnOnce from "warn-once";
@@ -42,6 +44,82 @@ describe("useMany Hook", () => {
     expect(data?.data.length).toBe(2);
     expect(manyResult.data).toBeDefined();
     expect(manyResult.data?.length).toBe(2);
+  });
+
+  it("should cache per tenant: a tenant switch misses, switching back hits", async () => {
+    const getManyMock = vi.fn(({ meta }) =>
+      Promise.resolve({ data: [{ id: meta?.tenantId }] }),
+    );
+
+    const Wrapper = TestWrapper({
+      dataProvider: {
+        default: {
+          ...MockJSONServer.default,
+          getMany: getManyMock,
+        },
+      },
+      resources: [{ name: "posts" }],
+    });
+
+    let tenantId = "tenant-1";
+
+    const { result, rerender } = renderHook(
+      () =>
+        useMany({
+          resource: "posts",
+          ids: ["1", "2"],
+          // keep tenant-1's entry alive and fresh while tenant-2 is active,
+          // so switching back can only be served by its own cache entry
+          queryOptions: {
+            staleTime: Number.POSITIVE_INFINITY,
+            gcTime: Number.POSITIVE_INFINITY,
+          },
+        }),
+      {
+        wrapper: ({ children }) => (
+          <Wrapper>
+            <MetaContextProvider value={{ tenantId }}>
+              {children}
+            </MetaContextProvider>
+          </Wrapper>
+        ),
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(getManyMock).toHaveBeenCalledTimes(1);
+    expect(getManyMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          queryKey: [
+            "data",
+            "default",
+            "posts",
+            "many",
+            ["1", "2"],
+            expect.objectContaining({ tenantId: "tenant-1" }),
+          ],
+        }),
+      }),
+    );
+
+    tenantId = "tenant-2";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-2" }]);
+    });
+    expect(getManyMock).toHaveBeenCalledTimes(2);
+
+    tenantId = "tenant-1";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(getManyMock).toHaveBeenCalledTimes(2);
   });
 
   it("should return result property with data", async () => {

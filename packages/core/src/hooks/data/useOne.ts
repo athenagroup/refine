@@ -179,6 +179,9 @@ export const useOne = <
       .id(id ?? "")
       .params({
         ...(preferredMeta || {}),
+        ...(combinedMeta.tenantId !== undefined && {
+          tenantId: combinedMeta.tenantId,
+        }),
       })
       .get(),
     queryFn: (context) =>

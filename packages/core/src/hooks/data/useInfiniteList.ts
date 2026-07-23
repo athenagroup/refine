@@ -237,6 +237,9 @@ export const useInfiniteList = <
       .action("infinite")
       .params({
         ...(preferredMeta || {}),
+        ...(combinedMeta.tenantId !== undefined && {
+          tenantId: combinedMeta.tenantId,
+        }),
         filters: prefferedFilters,
         hasPagination: isServerPagination,
         ...(isServerPagination && {

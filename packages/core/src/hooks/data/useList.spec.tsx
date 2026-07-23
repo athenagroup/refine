@@ -1,3 +1,4 @@
+import React from "react";
 import { vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
@@ -11,6 +12,7 @@ import {
 import { defaultRefineOptions } from "@contexts/refine";
 
 import type { IRefineContextProvider } from "../../contexts/refine/types";
+import { MetaContextProvider } from "../../contexts/metaContext";
 import { useList } from "./useList";
 
 const mockRefineProvider: IRefineContextProvider = {
@@ -144,6 +146,93 @@ describe("useList Hook", () => {
       );
     },
   );
+
+  it("should cache per tenant: a tenant switch misses, switching back hits", async () => {
+    const getListMock = vi.fn(({ meta }) =>
+      Promise.resolve({ data: [{ id: meta?.tenantId }], total: 1 }),
+    );
+
+    const Wrapper = TestWrapper({
+      dataProvider: {
+        default: {
+          ...MockJSONServer.default,
+          getList: getListMock,
+        },
+      },
+      resources: [{ name: "posts" }],
+    });
+
+    let tenantId = "tenant-1";
+
+    const { result, rerender } = renderHook(
+      () =>
+        useList({
+          resource: "posts",
+          // keep tenant-1's entry alive and fresh while tenant-2 is active,
+          // so switching back can only be served by its own cache entry
+          queryOptions: {
+            staleTime: Number.POSITIVE_INFINITY,
+            gcTime: Number.POSITIVE_INFINITY,
+          },
+        }),
+      {
+        wrapper: ({ children }) => (
+          <Wrapper>
+            <MetaContextProvider value={{ tenantId }}>
+              {children}
+            </MetaContextProvider>
+          </Wrapper>
+        ),
+      },
+    );
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(getListMock).toHaveBeenCalledTimes(1);
+    expect(getListMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          queryKey: [
+            "data",
+            "default",
+            "posts",
+            "list",
+            expect.objectContaining({ tenantId: "tenant-1" }),
+          ],
+        }),
+      }),
+    );
+
+    tenantId = "tenant-2";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-2" }]);
+    });
+    expect(getListMock).toHaveBeenCalledTimes(2);
+    expect(getListMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        meta: expect.objectContaining({
+          queryKey: [
+            "data",
+            "default",
+            "posts",
+            "list",
+            expect.objectContaining({ tenantId: "tenant-2" }),
+          ],
+        }),
+      }),
+    );
+
+    tenantId = "tenant-1";
+    rerender();
+
+    await waitFor(() => {
+      expect(result.current.result?.data).toEqual([{ id: "tenant-1" }]);
+    });
+    expect(getListMock).toHaveBeenCalledTimes(2);
+  });
 
   it("data should be sliced when pagination mode is client", async () => {
     const { result } = renderHook(
