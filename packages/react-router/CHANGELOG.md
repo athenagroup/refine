@@ -1,5 +1,11 @@
 # @refinedev/react-router-v6
 
+## 2.0.6
+
+### Patch Changes
+
+- [#32](https://github.com/athenagroup/refine/pull/32) [`4e0391a1b6f02d3b37f3dc24409f123c52b5bdc2`](https://github.com/athenagroup/refine/commit/4e0391a1b6f02d3b37f3dc24409f123c52b5bdc2) Thanks [@Woutuuur](https://github.com/Woutuuur)! - Widen accepted react-router version to include version ^8.
+
 ## 2.0.5
 
 ### Patch Changes
