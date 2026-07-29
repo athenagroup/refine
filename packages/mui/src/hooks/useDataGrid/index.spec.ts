@@ -900,4 +900,120 @@ describe("useDataGrid Hook", () => {
       },
     ]);
   });
+
+  describe("dataGridProps referential stability", () => {
+    it("keeps dataGridProps and its handlers/paginationModel/rows stable across a re-render when nothing changes", async () => {
+      const { result, rerender } = renderHook(
+        () => useDataGrid({ resource: "posts" }),
+        {
+          wrapper: TestWrapper({
+            dataProvider: MockJSONServer,
+            resources: [{ name: "posts" }],
+          }),
+        },
+      );
+
+      await waitFor(() => {
+        expect(result.current.tableQuery.isSuccess).toBeTruthy();
+      });
+
+      const first = result.current.dataGridProps;
+
+      rerender();
+
+      const second = result.current.dataGridProps;
+      // The whole object identity is stable so MUI-X's rootProps context (and
+      // every memoized GridRow) can bail out of re-rendering.
+      expect(second).toBe(first);
+      expect(second.onSortModelChange).toBe(first.onSortModelChange);
+      expect(second.onFilterModelChange).toBe(first.onFilterModelChange);
+      expect(second.onPaginationModelChange).toBe(
+        first.onPaginationModelChange,
+      );
+      expect(second.onStateChange).toBe(first.onStateChange);
+      expect(second.processRowUpdate).toBe(first.processRowUpdate);
+      expect(second.paginationModel).toBe(first.paginationModel);
+      expect(second.rows).toBe(first.rows);
+    });
+
+    it("returns a new paginationModel when the page changes, keeping the handler stable", async () => {
+      const { result } = renderHook(() => useDataGrid({ resource: "posts" }), {
+        wrapper: TestWrapper({
+          dataProvider: MockJSONServer,
+          resources: [{ name: "posts" }],
+        }),
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableQuery.isSuccess).toBeTruthy();
+      });
+
+      const initialPaginationModel =
+        result.current.dataGridProps.paginationModel;
+      const initialHandler =
+        result.current.dataGridProps.onPaginationModelChange;
+
+      await act(async () => {
+        result.current.dataGridProps.onPaginationModelChange!(
+          { page: 3, pageSize: 25 },
+          {} as any,
+        );
+      });
+
+      await waitFor(() => {
+        expect(result.current.currentPage).toBe(4);
+      });
+
+      // Content changed -> new paginationModel identity...
+      expect(result.current.dataGridProps.paginationModel).not.toBe(
+        initialPaginationModel,
+      );
+      expect(result.current.dataGridProps.paginationModel).toEqual({
+        page: 3,
+        pageSize: 25,
+      });
+      // ...but the (memoized) handler identity stays stable.
+      expect(result.current.dataGridProps.onPaginationModelChange).toBe(
+        initialHandler,
+      );
+    });
+
+    it("stable handlers still operate on the latest state after an unrelated change", async () => {
+      const { result } = renderHook(() => useDataGrid({ resource: "posts" }), {
+        wrapper: TestWrapper({
+          dataProvider: MockJSONServer,
+          resources: [{ name: "posts" }],
+        }),
+      });
+
+      await waitFor(() => {
+        expect(result.current.tableQuery.isSuccess).toBeTruthy();
+      });
+
+      // Capture the stable sort handler before any state moves.
+      const sortHandler = result.current.dataGridProps.onSortModelChange;
+
+      await act(async () => {
+        result.current.dataGridProps.onPaginationModelChange!(
+          { page: 2, pageSize: 25 },
+          {} as any,
+        );
+      });
+      await waitFor(() => {
+        expect(result.current.currentPage).toBe(3);
+      });
+
+      // The reference is unchanged, yet it still applies sorting correctly
+      // (i.e. it reads live state via stable setters, not a stale closure).
+      expect(result.current.dataGridProps.onSortModelChange).toBe(sortHandler);
+      await act(async () => {
+        sortHandler!([{ field: "title", sort: "desc" }], {} as any);
+      });
+      await waitFor(() => {
+        expect(result.current.dataGridProps.sortModel).toEqual([
+          { field: "title", sort: "desc" },
+        ]);
+      });
+    });
+  });
 });
