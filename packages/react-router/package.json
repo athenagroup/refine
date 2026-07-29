@@ -1,6 +1,6 @@
 {
   "name": "@athenagroup/refine-react-router",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "private": false,
   "description": "React Router support for Refine, with full routing capabilities.",
   "repository": {

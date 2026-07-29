@@ -1,5 +1,13 @@
 # @refinedev/core
 
+## 5.1.3
+
+### Patch Changes
+
+- [#28](https://github.com/athenagroup/refine/pull/28) [`97df4ddff2bce67edd001f5e944a5584a9ac61e1`](https://github.com/athenagroup/refine/commit/97df4ddff2bce67edd001f5e944a5584a9ac61e1) Thanks [@Woutuuur](https://github.com/Woutuuur)! - fix(core): include tenantId in data query keys
+
+  The data hooks now include the combined meta's `tenantId` in their query keys, so a tenant switch is a cache miss with per-tenant caching instead of serving the previous tenant's cached data.
+
 ## 5.1.2
 
 ### Patch Changes
