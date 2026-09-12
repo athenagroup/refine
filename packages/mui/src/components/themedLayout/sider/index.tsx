@@ -155,9 +155,11 @@ export const ThemedSider: React.FC<RefineThemedLayoutSiderProps> = ({
                   </ListItemIcon>
                   <ListItemText
                     primary={label}
-                    primaryTypographyProps={{
-                      noWrap: true,
-                      fontSize: "14px",
+                    slotProps={{
+                      primary: {
+                        noWrap: true,
+                        sx: { fontSize: "14px" },
+                      },
                     }}
                   />
                   {isOpen ? (
@@ -235,9 +237,11 @@ export const ThemedSider: React.FC<RefineThemedLayoutSiderProps> = ({
               </ListItemIcon>
               <ListItemText
                 primary={label}
-                primaryTypographyProps={{
-                  noWrap: true,
-                  fontSize: "14px",
+                slotProps={{
+                  primary: {
+                    noWrap: true,
+                    sx: { fontSize: "14px" },
+                  },
                 }}
               />
             </ListItemButton>
@@ -285,9 +289,11 @@ export const ThemedSider: React.FC<RefineThemedLayoutSiderProps> = ({
             </ListItemIcon>
             <ListItemText
               primary={translate("dashboard.title", "Dashboard")}
-              primaryTypographyProps={{
-                noWrap: true,
-                fontSize: "14px",
+              slotProps={{
+                primary: {
+                  noWrap: true,
+                  sx: { fontSize: "14px" },
+                },
               }}
             />
           </ListItemButton>
@@ -341,9 +347,11 @@ export const ThemedSider: React.FC<RefineThemedLayoutSiderProps> = ({
         </ListItemIcon>
         <ListItemText
           primary={t("buttons.logout", "Logout")}
-          primaryTypographyProps={{
-            noWrap: true,
-            fontSize: "14px",
+          slotProps={{
+            primary: {
+              noWrap: true,
+              sx: { fontSize: "14px" },
+            },
           }}
         />
       </ListItemButton>

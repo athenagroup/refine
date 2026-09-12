@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 
 import Info from "@mui/icons-material/Info";
 
@@ -34,8 +34,22 @@ export const ErrorComponent: React.FC<RefineErrorPageProps> = () => {
   }, [action, resource]);
 
   return (
-    <Grid display="flex" justifyContent="center" alignItems="center" mt={20}>
-      <Grid container direction="column" display="flex" alignItems="center">
+    <Grid
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        mt: 20,
+      }}
+    >
+      <Grid
+        container
+        sx={{
+          flexDirection: "column",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <Typography variant="h1">404</Typography>
         <Stack direction="row" spacing="2">
           <Typography>

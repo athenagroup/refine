@@ -10,7 +10,7 @@ import type { RefineBreadcrumbProps } from "@refinedev/ui-types";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Typography from "@mui/material/Typography";
 import { Link as MuiLink } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 
 import type { BreadcrumbsProps as MuiBreadcrumbProps } from "@mui/material/Breadcrumbs";
 import type { LinkProps } from "@mui/material/Link";
@@ -101,7 +101,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
                 {label}
               </LinkRouter>
             ) : (
-              <Typography fontSize="14px">{label}</Typography>
+              <Typography sx={{ fontSize: "14px" }}>{label}</Typography>
             )}
           </Grid>
         );

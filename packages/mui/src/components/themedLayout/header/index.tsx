@@ -24,15 +24,19 @@ export const ThemedHeader: React.FC<RefineThemedLayoutHeaderProps> = ({
         <HamburgerMenu />
         <Stack
           direction="row"
-          width="100%"
-          justifyContent="flex-end"
-          alignItems="center"
+          sx={{
+            width: "100%",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
         >
           <Stack
             direction="row"
-            gap="16px"
-            alignItems="center"
-            justifyContent="center"
+            sx={{
+              gap: "16px",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
             {user?.name && (
               <Typography variant="subtitle2" data-testid="header-user-name">

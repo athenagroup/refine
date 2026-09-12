@@ -146,7 +146,7 @@ export const RegisterPage: React.FC<RegisterProps> = ({
           align="center"
           style={titleStyles}
           color="primary"
-          fontWeight={700}
+          sx={{ fontWeight: 700 }}
         >
           {translate("pages.register.title", "Sign up for your account")}
         </Typography>
@@ -224,9 +224,6 @@ export const RegisterPage: React.FC<RegisterProps> = ({
         )}
         {loginLink ?? (
           <Box
-            display="flex"
-            justifyContent="flex-end"
-            alignItems="center"
             sx={{
               mt: "24px",
               display: "flex",
@@ -234,7 +231,11 @@ export const RegisterPage: React.FC<RegisterProps> = ({
               alignItems: "center",
             }}
           >
-            <Typography variant="body2" component="span" fontSize="12px">
+            <Typography
+              variant="body2"
+              component="span"
+              sx={{ fontSize: "12px" }}
+            >
               {translate(
                 "pages.register.buttons.haveAccount",
                 translate(
@@ -244,14 +245,12 @@ export const RegisterPage: React.FC<RegisterProps> = ({
               )}
             </Typography>
             <MuiLink
-              ml="4px"
               variant="body2"
               color="primary"
               component={Link as any}
               underline="none"
               to="/login"
-              fontSize="12px"
-              fontWeight="bold"
+              sx={{ fontSize: "12px", fontWeight: "bold" }}
             >
               {translate(
                 "pages.register.signin",

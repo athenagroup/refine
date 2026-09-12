@@ -91,7 +91,7 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordProps> = ({
           align="center"
           style={titleStyles}
           color="primary"
-          fontWeight={700}
+          sx={{ fontWeight: 700 }}
         >
           {translate("pages.forgotPassword.title", "Forgot your password?")}
         </Typography>
@@ -132,8 +132,12 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordProps> = ({
             }}
           />
           {loginLink ?? (
-            <Box textAlign="right" sx={{ mt: "24px" }}>
-              <Typography variant="body2" component="span" fontSize="12px">
+            <Box sx={{ textAlign: "right", mt: "24px" }}>
+              <Typography
+                variant="body2"
+                component="span"
+                sx={{ fontSize: "12px" }}
+              >
                 {translate(
                   "pages.forgotPassword.buttons.haveAccount",
                   translate(
@@ -147,8 +151,7 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordProps> = ({
                 component={Link as any}
                 underline="none"
                 to="/login"
-                fontWeight="bold"
-                fontSize="12px"
+                sx={{ fontWeight: "bold", fontSize: "12px" }}
                 color="primary.light"
               >
                 {translate(
