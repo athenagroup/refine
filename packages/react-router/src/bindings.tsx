@@ -3,7 +3,6 @@ import {
   type GoConfig,
   type ParseResponse,
   type RouterProvider,
-  matchResourceFromRoute,
   ResourceContext,
   QS_PARSE_DEPTH,
 } from "@refinedev/core";
@@ -17,6 +16,7 @@ import {
   useParams,
 } from "react-router";
 import { convertToNumberIfPossible } from "./convert-to-number-if-possible";
+import { matchResourceFromRouteCached } from "./match-resource-from-route-cached";
 
 export const stringifyConfig = {
   addQueryPrefix: true,
@@ -101,8 +101,10 @@ export const routerProvider: RouterProvider = {
     const { pathname, search } = useLocation();
     const { resources } = useContext(ResourceContext);
 
+    // every hook that reads the route owns its own `parse` instance, so the
+    // match is shared through a module level cache instead of per instance
     const { resource, action, matchedRoute } = React.useMemo(() => {
-      return matchResourceFromRoute(pathname, resources);
+      return matchResourceFromRouteCached(pathname, resources);
     }, [resources, pathname]);
 
     // params is empty when useParams is used in a component that is not a child of a Route
