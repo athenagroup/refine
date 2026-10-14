@@ -1,5 +1,11 @@
 # @refinedev/react-router-v6
 
+## 2.0.7
+
+### Patch Changes
+
+- [#48](https://github.com/athenagroup/refine/pull/48) [`b271c05c90a914436312ea3d491584504723be2b`](https://github.com/athenagroup/refine/commit/b271c05c90a914436312ea3d491584504723be2b) Thanks [@jwgmeligmeyling](https://github.com/jwgmeligmeyling)! - perf: share the resource match of the `parse` hook across hook instances, so a navigation scans the resources once per pathname instead of once per hook.
+
 ## 2.0.6
 
 ### Patch Changes
