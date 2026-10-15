@@ -10,9 +10,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 
-import LoadingButton from "@mui/lab/LoadingButton";
-
-import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import DeleteOutline from "@mui/icons-material/DeleteOutlined";
 
 import type { DeleteButtonProps } from "../types";
 
@@ -75,7 +73,12 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
 
   if (isHidden) return null;
 
-  const defaultIcon = <DeleteOutline fontSize="small" {...svgIconProps} />;
+  const defaultIcon = (
+    <DeleteOutline
+      fontSize="small"
+      {...(svgIconProps as React.ComponentProps<typeof DeleteOutline>)}
+    />
+  );
 
   // When `hideText` is true, the button renders only an icon (no startIcon prop).
   // When `hideText` is false, the icon goes into the `startIcon` slot and text goes as children.
@@ -89,14 +92,18 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   // | true     | <CustomIcon> | undefined             | <CustomIcon>     |
   const buttonStartIcon = hideText
     ? undefined
-    : startIcon ?? <DeleteOutline {...svgIconProps} />;
+    : startIcon ?? (
+        <DeleteOutline
+          {...(svgIconProps as React.ComponentProps<typeof DeleteOutline>)}
+        />
+      );
   const buttonChildren = hideText
     ? startIcon ?? defaultIcon
     : children ?? label;
 
   return (
     <div>
-      <LoadingButton
+      <Button
         color="error"
         onClick={() => setOpen(true)}
         disabled={isDisabled}
@@ -110,7 +117,7 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
         {...restProps}
       >
         {buttonChildren}
-      </LoadingButton>
+      </Button>
       <Dialog
         open={open}
         onClose={() => setOpen(false)}

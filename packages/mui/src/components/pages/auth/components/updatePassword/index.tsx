@@ -92,7 +92,7 @@ export const UpdatePasswordPage: React.FC<UpdatePasswordProps> = ({
           align="center"
           style={titleStyles}
           color="primary"
-          fontWeight={700}
+          sx={{ fontWeight: 700 }}
         >
           {translate("pages.updatePassword.title", "Set New Password")}
         </Typography>

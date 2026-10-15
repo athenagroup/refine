@@ -38,11 +38,13 @@ export const ThemedTitle: React.FC<RefineLayoutThemedTitleProps> = ({
         {!collapsed && (
           <Typography
             variant="h6"
-            fontWeight={700}
             color="text.primary"
-            fontSize="inherit"
-            textOverflow="ellipsis"
-            overflow="hidden"
+            sx={{
+              fontWeight: 700,
+              fontSize: "inherit",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
           >
             {text}
           </Typography>

@@ -13,7 +13,6 @@ import type {
   RefineShowButtonProps,
 } from "@refinedev/ui-types";
 
-import type { LoadingButtonProps } from "@mui/lab/LoadingButton";
 import type { ButtonProps } from "@mui/material/Button";
 import type { SvgIconProps } from "@mui/material/SvgIcon";
 
@@ -49,7 +48,7 @@ export type EditButtonProps = RefineEditButtonProps<
 >;
 
 export type ExportButtonProps = RefineExportButtonProps<
-  LoadingButtonProps,
+  ButtonProps,
   {
     svgIconProps?: SvgIconProps;
   }
@@ -78,7 +77,7 @@ export type RefreshButtonProps = RefineRefreshButtonProps<
 >;
 
 export type SaveButtonProps = RefineSaveButtonProps<
-  LoadingButtonProps,
+  ButtonProps,
   {
     svgIconProps?: SvgIconProps;
   }

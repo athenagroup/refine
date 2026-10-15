@@ -112,7 +112,7 @@ export const Edit: React.FC<EditProps> = ({
   };
 
   const defaultHeaderButtons = (
-    <Box display="flex" flexDirection="row" alignItems="center">
+    <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
       {autoSaveProps && <AutoSaveIndicator {...autoSaveProps} />}
       {hasList && <ListButton {...listButtonProps} />}
       <RefreshButton {...refreshButtonProps} />
@@ -212,7 +212,10 @@ export const Edit: React.FC<EditProps> = ({
           )
         }
         action={
-          <Box display="flex" gap="16px" {...(headerButtonProps ?? {})}>
+          <Box
+            sx={{ display: "flex", gap: "16px" }}
+            {...(headerButtonProps ?? {})}
+          >
             {headerButtons
               ? typeof headerButtons === "function"
                 ? headerButtons({

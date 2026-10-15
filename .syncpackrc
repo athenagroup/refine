@@ -4,6 +4,12 @@
   "semverGroups": [],
   "versionGroups": [
     {
+      "dependencies": ["@mui/**"],
+      "packages": ["@athenagroup/refine-mui"],
+      "isIgnored": true,
+      "label": "refine-mui targets a newer MUI major (v7+/v9) than the examples."
+    },
+    {
       "dependencies": ["@types/**", "@testing-library/**", "typescript"],
       "dependencyTypes": ["prod"],
       "isBanned": true,

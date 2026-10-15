@@ -140,7 +140,7 @@ export const LoginPage: React.FC<LoginProps> = ({
           align="center"
           style={titleStyles}
           color="primary"
-          fontWeight={700}
+          sx={{ fontWeight: 700 }}
         >
           {translate("pages.login.title", "Sign in to your account")}
         </Typography>
@@ -264,10 +264,9 @@ export const LoginPage: React.FC<LoginProps> = ({
             }}
           >
             <Typography
-              textAlign="center"
               variant="body2"
               component="span"
-              fontSize="12px"
+              sx={{ textAlign: "center", fontSize: "12px" }}
             >
               {translate(
                 "pages.login.buttons.noAccount",

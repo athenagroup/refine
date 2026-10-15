@@ -5,7 +5,7 @@ import {
   RefineButtonTestIds,
 } from "@refinedev/ui-types";
 
-import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
 import RefreshOutlined from "@mui/icons-material/RefreshOutlined";
 
 import type { RefreshButtonProps } from "../types";
@@ -60,7 +60,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
     : children ?? label;
 
   return (
-    <LoadingButton
+    <Button
       startIcon={buttonStartIcon}
       loading={loading}
       loadingPosition={hideText ? "center" : "start"}
@@ -71,6 +71,6 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
       {...restProps}
     >
       {buttonChildren}
-    </LoadingButton>
+    </Button>
   );
 };

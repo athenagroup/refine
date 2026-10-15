@@ -133,7 +133,10 @@ export const Create: React.FC<CreateProps> = ({
         }
         action={
           headerButtons ? (
-            <Box display="flex" gap="16px" {...(headerButtonProps ?? {})}>
+            <Box
+              sx={{ display: "flex", gap: "16px" }}
+              {...(headerButtonProps ?? {})}
+            >
               {headerButtons
                 ? typeof headerButtons === "function"
                   ? headerButtons({

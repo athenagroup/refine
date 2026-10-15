@@ -69,13 +69,15 @@ const Message = ({
 
   return (
     <Typography
-      color="gray"
-      fontSize="0.8rem"
-      position="relative"
-      display="flex"
-      alignItems="center"
-      flexWrap="wrap"
-      marginRight=".3rem"
+      sx={{
+        color: "gray",
+        fontSize: "0.8rem",
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        marginRight: ".3rem",
+      }}
     >
       {translate(translationKey, defaultMessage)}
       <span style={{ position: "relative", top: "3px", marginLeft: "3px" }}>

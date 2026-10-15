@@ -5,7 +5,7 @@ import {
   RefineButtonTestIds,
 } from "@refinedev/ui-types";
 
-import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
 import ImportExportOutlined from "@mui/icons-material/ImportExportOutlined";
 
 import type { ExportButtonProps } from "../types";
@@ -51,7 +51,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
     : children ?? label;
 
   return (
-    <LoadingButton
+    <Button
       loading={loading}
       startIcon={buttonStartIcon}
       loadingPosition={hideText ? "center" : "start"}
@@ -61,6 +61,6 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       {...restProps}
     >
       {buttonChildren}
-    </LoadingButton>
+    </Button>
   );
 };

@@ -5,7 +5,7 @@ import {
   RefineButtonTestIds,
 } from "@refinedev/ui-types";
 
-import LoadingButton from "@mui/lab/LoadingButton";
+import Button from "@mui/material/Button";
 import SaveOutlined from "@mui/icons-material/SaveOutlined";
 
 import type { SaveButtonProps } from "../types";
@@ -48,7 +48,7 @@ export const SaveButton: React.FC<SaveButtonProps> = ({
     : children ?? label;
 
   return (
-    <LoadingButton
+    <Button
       startIcon={buttonStartIcon}
       sx={{ minWidth: 0, ...sx }}
       variant="contained"
@@ -57,6 +57,6 @@ export const SaveButton: React.FC<SaveButtonProps> = ({
       {...restProps}
     >
       {buttonChildren}
-    </LoadingButton>
+    </Button>
   );
 };
